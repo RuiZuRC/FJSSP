@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+//#include <locale.h>
+#include <windows.h>
+
 /* ================= STRUCT MAQUINA ================= */
 typedef struct Maquina
 {
@@ -30,6 +33,7 @@ typedef struct Operacao
 {
     int idOperacao;
     char descOperacao[100];
+    int idTrabalho;
     MaquinasOperacao *maquinas;
     struct Operacao *seguinte;
 } Operacoes;
@@ -77,7 +81,7 @@ void verTrabalho(Trabalhos *trabalhoEscolhido);
 /* ================= OPERAÇÕES ================= */
 void adicionarOperacao(Trabalhos *trabalhoEscolhido);
 int proximoIdOperacao();
-Operacoes *inserirInicioOperacao(Operacoes *operacoes);
+Operacoes *inserirInicioOperacao(Operacoes *operacoes, int idTrabalho);
 
 /*
     DADOS
@@ -164,6 +168,12 @@ void gestaoJobs();     // GESTÃO DE JOBS
 
 int main()
 {
+    // Define o valor das páginas de código UTF8 e default do Windows
+    UINT CPAGE_UTF8 = 65001;
+    UINT CPAGE_DEFAULT = GetConsoleOutputCP();
+
+    // Define codificação como sendo UTF-8
+    SetConsoleOutputCP(CPAGE_UTF8);
     /*
         Maquinas *maquinas = NULL;
         MaquinasOperacao *maquinasOperacao = NULL;
@@ -181,6 +191,8 @@ int main()
         system("pause");
     */
     menu();
+    // Retorna codificação padrão do Windows
+    SetConsoleOutputCP(CPAGE_DEFAULT);
 }
 void menu()
 {
@@ -222,6 +234,8 @@ Maquinas *inserirInicio(Maquinas *maquinas)
     // VERIFICAR SE A ESTRUTURA ESTÁ CRIADA
     if (novaMaquina != NULL)
     {
+        char temp;
+        scanf("%c", &temp); // temp statement to clear buffer
         // INSERIR NOME DA MAQUINA ESTRUTURA
         printf("Digite o nome da maquina: ");
         // scanf("%s", novaMaquina->descMaquina);//BREACKS WITH SPACES
@@ -368,7 +382,9 @@ void gestaoMaquinas()
     {
     case 1:
         system("cls");
-        // inserirMaquina(maquinas);
+        maquinas = inserirInicio(maquinas);
+        inserirFicheiro(maquinas);
+        gestaoMaquinas();
         break;
     case 2:
         system("cls");
@@ -401,8 +417,8 @@ void gestaoJobs()
     percorrerTrabalhos(trabalhos); // LISTAR TRABALHOS
     printf("*** AÇÕES ***\n\n");
     printf("\t1 - Inserir Job\n");
-    printf("\t2 - Alterar Job\n");
-    printf("\t3 - Remover Job\n");
+    printf("\t2 - Alterar Job (+Em Falta+)\n");
+    printf("\t3 - Remover Job (+Em Falta+)\n");
     printf("\t4 - Ver Job \n");
     printf("\t0 - Voltar\n");
     printf("\n\nOpção: ");
@@ -601,17 +617,19 @@ void verTrabalho(Trabalhos *trabalhoEscolhido)
     system("cls");
     // printf("Trabalho encontrado!\n");
     printf("**======================================================**\n");
-    printf("\tID: %d\n", trabalhoEscolhido->idTrabalho);
-    printf("**======================================================**\n");
-    printf("\tDescrição: %s", trabalhoEscolhido->descTrabalho);
+    printf("\tID: %d \t  |\t Descrição: %s\n", trabalhoEscolhido->idTrabalho, trabalhoEscolhido->descTrabalho);
     printf("**======================================================**\n");
     if(trabalhoEscolhido->operacoes != NULL){
-        printf("OPERAÇÕES: %s\n", trabalhoEscolhido->operacoes->descOperacao);
+            printf("**======================================================**\n");
+            printf(" Listagem de Operações do Trabalho %s", trabalhoEscolhido->descTrabalho);
+            printf("**======================================================**\n");
+            //IMPRIME APENAS A 1º OPERACAO
+            printf("-> %s\n", trabalhoEscolhido->operacoes->descOperacao);
     }
     printf("\n\n");
     printf("*** AÇÕES ***\n\n");
-    printf("1 - Adicionar Operação\n");
-    printf("2 - Ver Operações\n");
+    printf("1 - Adicionar Operação (+Em Falta Adicionar a Ficheiro+)\n");
+    printf("2 - Ver Operações (+Em Falta+)\n");
     printf("0 - Voltar\n");
     int opcao;
     printf("Opcão: ");
@@ -639,8 +657,9 @@ void verTrabalho(Trabalhos *trabalhoEscolhido)
 
 void adicionarOperacao(Trabalhos *trabalhoEscolhido)
 {
+    int idTrabalho = trabalhoEscolhido->idTrabalho;
     Operacoes *operacoes = NULL;
-    operacoes = inserirInicioOperacao(operacoes);
+    operacoes = inserirInicioOperacao(operacoes, idTrabalho);
     trabalhoEscolhido->operacoes = operacoes;
     verTrabalho(trabalhoEscolhido);
     system("pause");           
@@ -658,11 +677,12 @@ int proximoIdOperacao(){
     }
     return idOperacao;
 };
-Operacoes *inserirInicioOperacao(Operacoes *operacoes){
+Operacoes *inserirInicioOperacao(Operacoes *operacoes, int idTrabalho){
     Operacoes *novaOperacao = (Operacoes *)malloc(sizeof(Operacoes)); // CRIAR NOVA "ESTRUTURA"
     // VERIFICAR SE A ESTRUTURA ESTÁ CRIADA
     if (novaOperacao != NULL)
     {
+        system("cls");
         char temp;
         scanf("%c", &temp); // temp statement to clear buffer
         // INSERIR NOME DA MAQUINA ESTRUTURA
@@ -671,6 +691,7 @@ Operacoes *inserirInicioOperacao(Operacoes *operacoes){
         system("cls");
         // INSERIR ID DA MAQUINA ESTRUTURA
         int idOperacao = proximoIdOperacao();
+        novaOperacao->idTrabalho = idTrabalho;
         novaOperacao->idOperacao = idOperacao;
         novaOperacao->seguinte = operacoes;
         return novaOperacao;
