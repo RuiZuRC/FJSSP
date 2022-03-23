@@ -71,8 +71,8 @@ MaquinasOperacao *inserirInicioMaquinaOperacao(MaquinasOperacao *maquinasOperaca
 /* ================= TRABALHOS ================= */
 Trabalhos *inserirInicioTrabalho(Trabalhos *trabalhos);
 Trabalhos *inserirFicheiroTrabalhos(Trabalhos *trabalhos);
-Trabalhos *lerFicheiroTrabalhos(Trabalhos *trabalhos);
-Trabalhos *lerProximoNoFicheiroTrabalhos(Trabalhos *trabalhos, FILE *ficheiro);
+Trabalhos *lerFicheiroTrabalhos(Trabalhos *trabalhos, Operacoes *operacoes);
+Trabalhos *lerProximoNoFicheiroTrabalhos(Trabalhos *trabalhos, Operacoes *operacoes, FILE *ficheiro);
 void percorrerTrabalhos(Trabalhos *trabalhos);
 int proximoIdTrabalho();
 void verTrabalhos(Trabalhos *trabalhos);
@@ -82,6 +82,9 @@ void verTrabalho(Trabalhos *trabalhoEscolhido);
 void adicionarOperacao(Trabalhos *trabalhoEscolhido);
 int proximoIdOperacao();
 Operacoes *inserirInicioOperacao(Operacoes *operacoes, int idTrabalho);
+Operacoes *inserirFicheiroOperacao(Operacoes *operacoes);
+Operacoes *lerFicheiroOperacoes(Operacoes *operacoes);
+Operacoes *lerProximoFicheiroOperacoes(Operacoes *operacoes, FILE * ficheiro);
 
 /*
     DADOS
@@ -413,7 +416,9 @@ void gestaoMaquinas()
 void gestaoJobs()
 {
     Trabalhos *trabalhos = NULL;
-    trabalhos = lerFicheiroTrabalhos(trabalhos);
+    Operacoes *operacoes = NULL;
+    operacoes = lerFicheiroOperacoes(operacoes);
+    trabalhos = lerFicheiroTrabalhos(trabalhos, operacoes);
     percorrerTrabalhos(trabalhos); // LISTAR TRABALHOS
     printf("*** AÇÕES ***\n\n");
     printf("\t1 - Inserir Job\n");
@@ -501,7 +506,7 @@ Trabalhos *inserirFicheiroTrabalhos(Trabalhos *trabalhos)
         fclose(ficheiro);
     }
 }
-Trabalhos *lerFicheiroTrabalhos(Trabalhos *trabalhos)
+Trabalhos *lerFicheiroTrabalhos(Trabalhos *trabalhos, Operacoes *operacoes)
 {
     FILE *ficheiro;
     ficheiro = fopen("complementFiles/trabalhos.bin", "rb");
@@ -520,19 +525,40 @@ Trabalhos *lerFicheiroTrabalhos(Trabalhos *trabalhos)
         for (int i = 0; i < numeroTrabalhos; i++)
         {
             fseek(ficheiro, (sizeof(Trabalhos) * (i)), SEEK_SET);
-            trabalhos = lerProximoNoFicheiroTrabalhos(trabalhos, ficheiro);
+            trabalhos = lerProximoNoFicheiroTrabalhos(trabalhos, operacoes, ficheiro);
         }
     }
     fclose(ficheiro);
     return trabalhos;
 }
-Trabalhos *lerProximoNoFicheiroTrabalhos(Trabalhos *trabalhos, FILE *ficheiro)
+Trabalhos *lerProximoNoFicheiroTrabalhos(Trabalhos *trabalhos, Operacoes *operacoes, FILE *ficheiro)y8
 {
     if (trabalhos == NULL)
     {
         Trabalhos *novoTrabalho = (Trabalhos *)malloc(sizeof(Trabalhos));
+        Operacoes *auxOperacao = operacoes;
+        Operacoes *novaOperacao = (Operacoes *)malloc(sizeof(Operacoes));
+        Operacoes *novaOperacaoAux = (Operacoes *)malloc(sizeof(Operacoes));
+        novaOperacaoAux = NULL;
         fread(novoTrabalho, sizeof(Trabalhos), 1, ficheiro);
         novoTrabalho->seguinte = NULL;
+
+        while(auxOperacao != NULL)
+        {
+            printf("%s\n", auxOperacao->descOperacao);
+            if(auxOperacao->idTrabalho == novoTrabalho->idTrabalho)
+            {
+                novaOperacao->idOperacao = auxOperacao->idOperacao;
+                strcpy(novaOperacao->descOperacao, auxOperacao->descOperacao);
+                novaOperacao->maquinas = NULL;
+                novaOperacao->seguinte = novaOperacaoAux;
+                //novaOperacaoAux = novaOperacao;
+                /* VERIFICAR MELHOR */
+            }
+            auxOperacao = auxOperacao->seguinte;
+        }
+        novoTrabalho->operacoes = novaOperacaoAux;
+
         trabalhos = novoTrabalho;
         return trabalhos;
     }
@@ -592,7 +618,7 @@ void verTrabalhos(Trabalhos *trabalhos)
         if (listaTrabalhos->idTrabalho == idTrabalho)
         {
             found = true;
-            trabalhoEscolhido->operacoes = NULL;
+            //trabalhoEscolhido->operacoes = NULL;
             trabalhoEscolhido = listaTrabalhos;
             break;
         }
@@ -620,11 +646,15 @@ void verTrabalho(Trabalhos *trabalhoEscolhido)
     printf("\tID: %d \t  |\t Descrição: %s\n", trabalhoEscolhido->idTrabalho, trabalhoEscolhido->descTrabalho);
     printf("**======================================================**\n");
     if(trabalhoEscolhido->operacoes != NULL){
-            printf("**======================================================**\n");
-            printf(" Listagem de Operações do Trabalho %s", trabalhoEscolhido->descTrabalho);
-            printf("**======================================================**\n");
-            //IMPRIME APENAS A 1º OPERACAO
+        printf("**======================================================**\n");
+        printf(" Listagem de Operações do Trabalho %s", trabalhoEscolhido->descTrabalho);
+        printf("**======================================================**\n");
+        //IMPRIME APENAS A 1º OPERACAO
+        //printf("-> %s\n", trabalhoEscolhido->operacoes->descOperacao);
+        while(trabalhoEscolhido->operacoes != NULL){
             printf("-> %s\n", trabalhoEscolhido->operacoes->descOperacao);
+            trabalhoEscolhido->operacoes = trabalhoEscolhido->operacoes->seguinte;
+        }
     }
     printf("\n\n");
     printf("*** AÇÕES ***\n\n");
@@ -659,7 +689,9 @@ void adicionarOperacao(Trabalhos *trabalhoEscolhido)
 {
     int idTrabalho = trabalhoEscolhido->idTrabalho;
     Operacoes *operacoes = NULL;
+    operacoes = lerFicheiroOperacoes(operacoes);
     operacoes = inserirInicioOperacao(operacoes, idTrabalho);
+    inserirFicheiroOperacao(operacoes);
     trabalhoEscolhido->operacoes = operacoes;
     verTrabalho(trabalhoEscolhido);
     system("pause");           
@@ -699,5 +731,54 @@ Operacoes *inserirInicioOperacao(Operacoes *operacoes, int idTrabalho){
         printf("Erro ao criar estrutura!\n");
         system("pause");
         return operacoes;
+    }
+}
+Operacoes *inserirFicheiroOperacao(Operacoes *operacoes){
+    FILE *ficheiro = fopen("complementFiles/operacoes.bin", "wb");
+    if(ficheiro == NULL){
+        printf("Erro ao abrir ficheiro!\n");
+    }else{
+        while(operacoes != NULL){
+            fwrite(operacoes, sizeof(*operacoes), 1, ficheiro);
+            operacoes = operacoes->seguinte;
+        }
+        fclose(ficheiro);
+    }
+}
+Operacoes *lerFicheiroOperacoes(Operacoes *operacoes){
+    FILE *ficheiro;
+    ficheiro = fopen("complementFiles/operacoes.bin", "rb");
+    if(ficheiro == NULL){
+        printf("Erro ao abrir ficheiro!\n");
+    }else
+    {
+        fseek(ficheiro, 0, SEEK_END);
+        long tamanhoFicheiro = ftell(ficheiro);
+        rewind(ficheiro);
+        int numeroOperacoes = (int)(tamanhoFicheiro / (sizeof(Operacoes)));
+        for (int i = 0; i < numeroOperacoes; i++)
+        {
+            fseek(ficheiro, (sizeof(Operacoes) * (i)), SEEK_SET);
+            operacoes = lerProximoFicheiroOperacoes(operacoes, ficheiro);
+        }
+    }
+    fclose(ficheiro);
+    return operacoes;
+}
+Operacoes *lerProximoFicheiroOperacoes(Operacoes *operacoes, FILE * ficheiro){
+    if(operacoes == NULL){
+        Operacoes *novaOperacao = (Operacoes *)malloc(sizeof(Operacoes));
+        fread(novaOperacao, sizeof(Operacoes), 1, ficheiro);
+        //printf("%s\n", novaOperacao->descOperacao);
+        novaOperacao->seguinte = NULL;
+        operacoes = novaOperacao;
+        return operacoes;
+    }else{
+        Operacoes *aux = operacoes;
+        Operacoes *novaOperacao = (Operacoes *)malloc(sizeof(Operacoes));
+        fread(novaOperacao, sizeof(Operacoes), 1, ficheiro);
+        //printf("%s\n", novaOperacao->descOperacao);
+        novaOperacao->seguinte = operacoes;
+        return novaOperacao;
     }
 }
