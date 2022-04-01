@@ -1,0 +1,103 @@
+[
+    {
+        "NomeTrabalho": "Process Plan 1",
+        "IDTrabalho": 1,
+        "Operações": [
+            {
+                "NomeOperação": "Operacao1",
+                "IDOperação": 1,
+                "Maquinas": [
+                    {
+                        "NomeMaquina": "Maquina1",
+                        "IDMaquina": 1,
+                        "TempoMaquina": 4,
+                    },
+                    {
+                        "NomeMaquina": "Maquina3",
+                        "IDMaquina": 3,
+                        "TempoMaquina": 5,
+                    }
+                ]
+            },
+            {
+                "NomeOperação": "Operacao2",
+                "IDOperação": 2,
+                "Maquinas": [
+                    {
+                        "NomeMaquina": "Maquina2",
+                        "IDMaquina": 2,
+                        "TempoMaquina": 4,
+                    },
+                    {
+                        "NomeMaquina": "Maquina4",
+                        "IDMaquina": 4,
+                        "TempoMaquina": 5,
+                    }
+                ]
+            },
+		{
+                "NomeOperação": "OperacaoDelete",
+                "IDOperação": 5,
+                "Maquinas": [
+                    {
+                        "NomeMaquina": "Maquina3",
+                        "IDMaquina": 3,
+                        "TempoMaquina": 5,
+                    },
+                    {
+                        "NomeMaquina": "Maquina5",
+                        "IDMaquina": 5,
+                        "TempoMaquina": 6,
+                    }
+                ]
+            },
+            {
+                "NomeOperação": "Operacao3",
+                "IDOperação": 3,
+                "Maquinas": [
+                    {
+                        "NomeMaquina": "Maquina3",
+                        "IDMaquina": 3,
+                        "TempoMaquina": 5,
+                    },
+                    {
+                        "NomeMaquina": "Maquina5",
+                        "IDMaquina": 5,
+                        "TempoMaquina": 6,
+                    }
+                ]
+            },
+            {
+                "NomeOperação": "Operacao4",
+                "IDOperação": 4,
+                "Maquinas": [
+                    {
+                        "NomeMaquina": "Maquina4",
+                        "IDMaquina": 4,
+                        "TempoMaquina": 5,
+                    },
+                    {
+                        "NomeMaquina": "Maquina5",
+                        "IDMaquina": 5,
+                        "TempoMaquina": 5,
+                    },
+                    {
+                        "NomeMaquina": "Maquina6",
+                        "IDMaquina": 6,
+                        "TempoMaquina": 4,
+                    },
+                    {
+                        "NomeMaquina": "Maquina7",
+                        "IDMaquina": 7,
+                        "TempoMaquina": 5,
+                    },
+                    {
+                        "NomeMaquina": "Maquina8",
+                        "IDMaquina": 8,
+                        "TempoMaquina": 9,
+                    }
+                ]
+            },
+        ]
+    },
+]
