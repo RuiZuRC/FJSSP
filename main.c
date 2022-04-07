@@ -829,7 +829,7 @@ void menuPrincipal(Trabalhos *trabalhos){
 void EstatisticasJob1(Trabalhos *trabalhos){
     system("cls");
     printf("||========================================================||\n");
-    printf("||                 MELHOR TEMPO DE EXECUÇÃO               ||\n");//SEM FONES
+    printf("||                 MELHOR TEMPO DE EXECUÇÃO               ||\n");
     printf("||========================================================||\n");
     int idTrabalho = 1;
     float MelhorTempoTotalJob = 0;
