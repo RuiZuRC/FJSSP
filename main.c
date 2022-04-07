@@ -29,26 +29,53 @@ typedef struct Trabalho
     struct Trabalho *seguinte;
 } Trabalhos;
 
+Trabalhos *lerFicheiro(Trabalhos *trabalhos);
+void salvarFicheiro(Trabalhos *trabalhos);
 void menuPrincipal(Trabalhos *trabalhos);
 void menuTrabalhos(Trabalhos *trabalhos);
 void EstatisticasJob1(Trabalhos *trabalhos);
-
-Maquinas *AdicionarMaquina(Maquinas *maquinas);
+int proximoIdMaquina();
+Maquinas *AdicionarMaquina(Maquinas *maquinas, int tipo);
 Maquinas *InserirInicioListaMaquinas(Maquinas *maquinas, int idMaquina, char descMaquina[100], float tempo);
 void percorrerMaquinas(Maquinas *maquinas);
-
+void listarMaquinas(Maquinas *maquinas, Trabalhos *trabalhos);
+Maquinas *EditarMaquina(Maquinas *maquinas, int idMaquina);
+Maquinas *DeleteMaquina(Maquinas *maquinas, int idMaquina);
+Maquinas *lerFicheiroMaquinas(Maquinas *maquinas);
+void salvarFicheiroMaquinas(Maquinas *maquinas);
+int proximoIdOperacao();
 Operacoes *InserirInicioListaOperacoes(Operacoes *operacoes, int idOperacao, char descOperacao[100], Maquinas *maquinas);
 void percorrerOperacoes(Operacoes *operacoes);
 void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho);
-
+int proximoIdTrabalho();
 Trabalhos *AdicionarOperacao(Trabalhos *trabalhos, int idTrabalho);
 Trabalhos *AdicionarTrabalho(Trabalhos *trabalhos);
 Trabalhos *InserirInicioListaTrabalhos(Trabalhos *trabalhos, int idTrabalho, char descTrabalho[100], Operacoes *operacoes);
 void percorrerTrabalhos(Trabalhos *trabalhos);
+Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho);
 void listarTrabalho(Trabalhos *trabalhos, int idTrabalho);
+Trabalhos *EditarTrabalho(Trabalhos *trabalhos, int idTrabalho);
+Trabalhos *DeleteTrabalho(Trabalhos *trabalhos, int idTrabalho);
+Trabalhos *EditarOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao);
+Trabalhos *EditarMaquinaOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao, int idMaquina);
+Trabalhos *DeleteMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho, int idMaquina);
 
 /* INICIO MAQUINAS */
-Maquinas *AdicionarMaquina(Maquinas *maquinas)
+int proximoIdMaquina()
+{
+    int idMaquina = 0;
+    FILE *arquivo = fopen("complemetFiles/proximoIdMaquina.txt", "r");
+    if (arquivo != NULL)
+    {
+        fscanf(arquivo, "%d", &idMaquina);
+        fclose(arquivo);
+        arquivo = fopen("complemetFiles/proximoIdMaquina.txt", "w");
+        fprintf(arquivo, "%d", idMaquina + 1);
+        fclose(arquivo);
+    }
+    return idMaquina;
+}
+Maquinas *AdicionarMaquina(Maquinas *maquinas, int tipo)
 {
     int idMaquina;
     char descMaquina[100];
@@ -59,17 +86,25 @@ Maquinas *AdicionarMaquina(Maquinas *maquinas)
     printf("||                   INSERIR MAQUINA                     ||\n");
     printf("||=======================================================||\n");
 
+    fflush(stdin);
     // INSERIR NOME DA MAQUINA ESTRUTURA
-    printf("Digite o nome da maquina: ");
-    scanf("%[^\n]", descMaquina);
+    printf("|| DIGITE O NOME DA MAQUINA: ");
+    // scanf("%[^/]s", descMaquina);
+    scanf("%[^\n]s", descMaquina);
+    fflush(stdin);
 
-    // INSERIR ID DA MAQUINA ESTRUTURA
-    printf("Insira o ID da máquina: ");
-    scanf("%d", &idMaquina);
+    idMaquina = proximoIdMaquina();
 
-    // INSERIR TEMPO DA MAQUINA ESTRUTURA
-    printf("Insira o tempo de duração da operação: ");
-    scanf("%f", &tempo);
+    if (tipo == 1)
+    {
+        // INSERIR TEMPO DA MAQUINA ESTRUTURA
+        printf("Insira o tempo de duração da operação: ");
+        scanf("%f", &tempo);
+    }
+    else
+    {
+        tempo = 0;
+    }
 
     system("cls");
     maquinas = InserirInicioListaMaquinas(maquinas, idMaquina, descMaquina, tempo);
@@ -105,9 +140,255 @@ void percorrerMaquinas(Maquinas *maquinas)
     printf("||========================================================||\n");
     printf("\n\n");
 }
-/* FIM MAQUINAS */
+void listarMaquinas(Maquinas *maquinas, Trabalhos *trabalhos)
+{
+    system("cls");
+    Maquinas *listaDeMaquinas = maquinas;
+    int opcao;
+    int idMaquina;
+    printf("||========================================================||\n");
+    printf("||                  LISTAGEM DE MAQUINAS                  ||\n");
+    printf("||========================================================||\n");
+    while (listaDeMaquinas != NULL)
+    {
+        printf("\tID Máquina: %d\n", listaDeMaquinas->idMaquina);
+        printf("\tNome da Máquina: %s\n", listaDeMaquinas->descMaquina);
+        if (listaDeMaquinas->seguinte != NULL)
+        {
+            printf("----------------------------------------------------------\n");
+        }
+        listaDeMaquinas = listaDeMaquinas->seguinte;
+    }
+    printf("||========================================================||\n");
+    printf("||                                                        ||\n");
+    printf("|| 1 - ADICIONAR MAQUINA                                  ||\n");
+    printf("|| 2 - EDITAR MAQUINA                                     ||\n");
+    printf("|| 3 - REMOVER MAQUINA                                    ||\n");
+    printf("|| 9 - VOLTAR                                             ||\n");
+    printf("|| 0 - SAIR                                               ||\n");
+    printf("||                                                        ||\n");
+    printf("||========================================================||\n");
+    printf("|| OPÇÃO: ");
+    scanf("%d", &opcao);
+    switch (opcao)
+    {
+    case 1:
+        // ADICIONAR MAQUINA
+        maquinas = AdicionarMaquina(maquinas, 0);
+        salvarFicheiroMaquinas(maquinas);
+        listarMaquinas(maquinas, trabalhos);
+        break;
+    case 2:
+        // EDITAR MAQUINA
+        printf("||========================================================||\n");
+        printf("|| ID DA MAQUINA QUE PRETENDE EDITAR: ");
+        scanf("%d", &idMaquina);
+        maquinas = EditarMaquina(maquinas, idMaquina);
+        salvarFicheiroMaquinas(maquinas);
+        listarMaquinas(maquinas, trabalhos);
+        break;
+    case 3:
+        // REMOVER MAQUINA
+        printf("||========================================================||\n");
+        printf("|| ID DA MAQUINA QUE PRETENDE REMOVER: ");
+        scanf("%d", &idMaquina);
+        maquinas = DeleteMaquina(maquinas, idMaquina);
+        salvarFicheiroMaquinas(maquinas);
+        listarMaquinas(maquinas, trabalhos);
+        break;
+    case 9:
+        menuPrincipal(trabalhos);
+        break;
+    case 0:
+        exit(0);
+        break;
+    default:
+        printf("Opção inválida!\n");
+        break;
+    }
+}
+Maquinas *EditarMaquina(Maquinas *maquinas, int idMaquina)
+{
+    int found = 0;
+    system("cls");
+    Maquinas *listaDeMaquinas = maquinas;
+    while (listaDeMaquinas != NULL)
+    {
+        if (listaDeMaquinas->idMaquina == idMaquina)
+        {
 
+            found = 1;
+            printf("||========================================================||\n");
+            printf("||                     EDITAR MAQUINA                     ||\n");
+            printf("||========================================================||\n");
+            printf("\tID Maquina: %d\n", listaDeMaquinas->idMaquina);
+            printf("\tNome da Maquina: %s\n", listaDeMaquinas->descMaquina);
+            printf("||========================================================||\n");
+            printf("|| NOVO NOME DA MAQUINA:");
+            scanf("%s", listaDeMaquinas->descMaquina);
+        }
+
+        listaDeMaquinas = listaDeMaquinas->seguinte;
+    }
+    printf("||========================================================||\n");
+    if (found == 0)
+    {
+        printf("||              ID DA MAQUINA NÃO ENCONTRADO              ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    return maquinas;
+}
+Maquinas *DeleteMaquina(Maquinas *maquinas, int idMaquina)
+{
+    system("cls");
+    Maquinas *nodoAtual = maquinas;
+    Maquinas *nodoAnterior;
+    int found = 0;
+    if (nodoAtual->idMaquina == idMaquina)
+    {
+        found = 1;
+        maquinas = nodoAtual->seguinte;
+        free(nodoAtual);
+    }
+    else
+    {
+        nodoAnterior = maquinas;
+        nodoAtual = nodoAnterior->seguinte;
+        while ((nodoAtual != NULL) && (nodoAtual->idMaquina != idMaquina))
+        {
+            nodoAnterior = nodoAtual;
+            nodoAtual = nodoAtual->seguinte;
+        }
+        if (nodoAtual != NULL)
+        {
+            nodoAnterior->seguinte = nodoAtual->seguinte;
+            free(nodoAtual);
+            found = 1;
+        }
+    }
+
+    if (found == 0)
+    {
+        printf("||========================================================||\n");
+        printf("||              ID DA MAQUINA NÃO ENCONTRADO              ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    else
+    {
+        printf("||========================================================||\n");
+        printf("||                    MAQUINA REMOVIDA                    ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+
+    return maquinas;
+}
+Trabalhos *AdicionarMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
+{
+    system("cls");
+    Maquinas *listaDeMaquinas = NULL;
+    listaDeMaquinas = lerFicheiroMaquinas(listaDeMaquinas);
+    Maquinas *listaDeMaquinasAux = listaDeMaquinas;
+
+    Trabalhos *listaDeTrabalhos = trabalhos;
+    printf("||========================================================||\n");
+    printf("||           LISTAGEM DE MAQUINAS DISPONIVEIS             ||\n");
+    printf("||========================================================||\n");
+    while (listaDeMaquinas != NULL)
+    {
+        printf("\tID Máquina: %d\n", listaDeMaquinas->idMaquina);
+        printf("\tNome da Máquina: %s\n", listaDeMaquinas->descMaquina);
+        if (listaDeMaquinas->seguinte != NULL)
+        {
+            printf("----------------------------------------------------------\n");
+        }
+        listaDeMaquinas = listaDeMaquinas->seguinte;
+    }
+    printf("||========================================================||\n");
+    printf("|| ID DA MAQUINA QUE PRETENDE ADICIONAR: ");
+    int idMaquina;
+    int found = 0;
+    scanf("%d", &idMaquina);
+    listaDeMaquinas = listaDeMaquinasAux;
+    while (listaDeMaquinasAux != NULL)
+    {
+        if (listaDeMaquinasAux->idMaquina == idMaquina)
+        {
+            found = 1;
+            while (listaDeTrabalhos != NULL)
+            {
+                if (listaDeTrabalhos->idTrabalho == idTrabalho)
+                {
+                    Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
+                    while (listaDeOperacoes != NULL)
+                    {
+                        if (listaDeOperacoes->idOperacao == idOperacao)
+                        {
+                            Maquinas *maquinas = listaDeOperacoes->maquinas;
+                            Maquinas *maquinasAux = maquinas;
+                            while (maquinas != NULL)
+                            {
+                                if (maquinas->idMaquina == idMaquina)
+                                {
+                                    printf("||========================================================||\n");
+                                    printf("||              MAQUINA JÁ ADICIONADA A OPERAÇÃO         ||\n");
+                                    printf("||========================================================||\n");
+                                    system("pause");
+                                    found = 2;
+                                    break;
+                                }
+                                maquinas = maquinas->seguinte;
+                            }
+
+                            if (found == 1)
+                            {
+                                maquinas = listaDeMaquinas;
+                                while (maquinas != NULL)
+                                {
+                                    if (maquinas->idMaquina == idMaquina)
+                                    {
+                                        Maquinas *maquinaNova = (Maquinas *)malloc(sizeof(Maquinas));
+                                        maquinaNova->idMaquina = idMaquina;
+                                        strcpy(maquinaNova->descMaquina, maquinas->descMaquina);
+                                        printf("|| INSIRA O TEMPO DE DURAÇÃO DA OPERAÇÃO: ");
+                                        scanf("%f", &maquinaNova->tempo);
+                                        maquinaNova->seguinte = maquinasAux;
+                                        maquinasAux = maquinaNova;
+                                    }
+                                    maquinas = maquinas->seguinte;
+                                }
+
+                                listaDeOperacoes->maquinas = maquinasAux;
+                            }
+                        }
+                        listaDeOperacoes = listaDeOperacoes->seguinte;
+                    }
+                }
+                listaDeTrabalhos = listaDeTrabalhos->seguinte;
+            }
+        }
+        listaDeMaquinasAux = listaDeMaquinasAux->seguinte;
+    }
+    return trabalhos;
+}
+/* FIM MAQUINAS */
 /* INICIO OPERAÇÕES */
+int proximoIdOperacao()
+{
+    int idOperacao = 0;
+    FILE *arquivo = fopen("complemetFiles/proximoIdOperacao.txt", "r");
+    if (arquivo != NULL)
+    {
+        fscanf(arquivo, "%d", &idOperacao);
+        fclose(arquivo);
+        arquivo = fopen("complemetFiles/proximoIdOperacao.txt", "w");
+        fprintf(arquivo, "%d", idOperacao + 1);
+        fclose(arquivo);
+    }
+    return idOperacao;
+}
 Operacoes *InserirInicioListaOperacoes(Operacoes *operacoes, int idOperacao, char descOperacao[100], Maquinas *maquinas)
 {
     Operacoes *novaOperacao = (Operacoes *)malloc(sizeof(Operacoes));
@@ -145,7 +426,8 @@ void percorrerOperacoes(Operacoes *operacoes)
     printf("||========================================================||\n");
     printf("\n\n");
 }
-void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
+void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
+{
     system("cls");
     int found = 0;
     int opcao;
@@ -153,24 +435,26 @@ void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
     Trabalhos *listaDeTrabalhos = trabalhos;
     while (listaDeTrabalhos != NULL)
     {
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             printf("||========================================================||\n");
             printf("||                       OPERAÇÃO                         ||\n");
             printf("||========================================================||\n");
-            /* 
+            /*
                 printf("\tID Trabalho: %d\n", listaDeTrabalhos->idTrabalho);
-                printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);   
+                printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
                 printf("\tOperações do Trabalho: \n");
              */
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
             while (listaDeOperacoes != NULL)
             {
-                if(listaDeOperacoes->idOperacao == idOperacao){
+                if (listaDeOperacoes->idOperacao == idOperacao)
+                {
                     found = 1;
                     printf("\tID Operação: %d\n", listaDeOperacoes->idOperacao);
                     printf("\tNome da Operação: %s\n", listaDeOperacoes->descOperacao);
                     printf("\tMáquinas Operação: \n");
-                    
+                    Maquinas *maquinas = listaDeOperacoes->maquinas;
                     Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
                     while (listaDeMaquinas != NULL)
                     {
@@ -179,8 +463,8 @@ void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
                         printf("\t\tTempo de duração da Operação: %.2f\n", listaDeMaquinas->tempo);
                         printf("\t\t------------------------\n");
                         listaDeMaquinas = listaDeMaquinas->seguinte;
-                    } 
-                   
+                    }
+
                     printf("\t------------------------\n");
                 }
                 listaDeOperacoes = listaDeOperacoes->seguinte;
@@ -189,7 +473,8 @@ void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
         listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     printf("||========================================================||\n");
-    if(found == 0){
+    if (found == 0)
+    {
         printf("||              ID DE OPERAÇÃO NÃO ENCONTRADO             ||\n");
         printf("||========================================================||\n");
         system("pause");
@@ -203,37 +488,64 @@ void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
     printf("|| 0 - SAIR                                               ||\n");
     printf("||                                                        ||\n");
     printf("||========================================================||\n");
-    printf("||========================================================||\n");
     printf("|| OPÇÃO: ");
     scanf("%d", &opcao);
-    switch(opcao){
-        case 1:
-            //ADICIONAR MAQUINA
-            break;
-        case 2:
-            //EDITAR MAQUINA
-            break;
-        case 3:
-            //REMOVER MAQUINA
-            break;
-        case 9:
-            listarTrabalho(trabalhos, idTrabalho);
-            break;
-        case 0:
-            exit(0);
-            break;
-        default:
-            printf("||========================================================||\n");
-            printf("||                 OPÇÃO INVÁLIDA                         ||\n");
-            printf("||========================================================||\n");
-            system("pause");
-            listarOperacao(trabalhos, idOperacao, idTrabalho);
-            break;
+    switch (opcao)
+    {
+    case 1:
+        // ADICIONAR MAQUINA
+        trabalhos = AdicionarMaquinaOperacao(trabalhos, idOperacao, idTrabalho);
+        salvarFicheiro(trabalhos);
+        listarOperacao(trabalhos, idOperacao, idTrabalho);
+        break;
+    case 2:
+        printf("||========================================================||\n");
+        printf("|| ID DA MAQUINA QUE PRETENDE EDITAR: ");
+        scanf("%d", &idMaquina);
+        trabalhos = EditarMaquinaOperacao(trabalhos, idTrabalho, idOperacao, idMaquina);
+        salvarFicheiro(trabalhos);
+        listarOperacao(trabalhos, idOperacao, idTrabalho);
+        break;
+    case 3:
+        // REMOVER MAQUINA
+        printf("||========================================================||\n");
+        printf("|| ID DA MAQUINA QUE PRETENDE REMOVER: ");
+        scanf("%d", &idMaquina);
+        trabalhos = DeleteMaquinaOperacao(trabalhos, idOperacao, idTrabalho, idMaquina);
+        salvarFicheiro(trabalhos);
+        listarOperacao(trabalhos, idOperacao, idTrabalho);
+        break;
+    case 9:
+        listarTrabalho(trabalhos, idTrabalho);
+        break;
+    case 0:
+        exit(0);
+        break;
+    default:
+        printf("||========================================================||\n");
+        printf("||                 OPÇÃO INVÁLIDA                         ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+        listarOperacao(trabalhos, idOperacao, idTrabalho);
+        break;
     }
 }
 /* FIM OPERAÇÕES */
-
 /* INICIO TRABALHOS */
+int proximoIdTrabalho()
+{
+    int idTrabalho = 0;
+    FILE *arquivo = fopen("complemetFiles/proximoIdTrabalho.txt", "r");
+    if (arquivo != NULL)
+    {
+        fscanf(arquivo, "%d", &idTrabalho);
+        fclose(arquivo);
+        arquivo = fopen("complemetFiles/proximoIdTrabalho.txt", "w");
+        fprintf(arquivo, "%d", idTrabalho + 1);
+        fclose(arquivo);
+    }
+    return idTrabalho;
+}
 Trabalhos *AdicionarOperacao(Trabalhos *trabalhos, int idTrabalho)
 {
 
@@ -246,19 +558,18 @@ Trabalhos *AdicionarOperacao(Trabalhos *trabalhos, int idTrabalho)
     printf("||                   INSERIR OPERAÇÃO                    ||\n");
     printf("||=======================================================||\n");
 
+    fflush(stdin);
     // INSERIR NOME DA OPERAÇÃO
-    printf("Digite o nome da Operação: ");
+    printf("|| DIGITE O NOME DA OPERAÇÃO: ");
     scanf("%s", descOperacao);
 
-    // INSERIR ID DA OPERAÇÃO
-    printf("Insira o ID da Operação: ");
-    scanf("%d", &idOperacao);
-    system("cls");
+    idOperacao = proximoIdOperacao();
 
     Trabalhos *listaDeTrabalhos = trabalhos;
     while (listaDeTrabalhos != NULL)
     {
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             operacoes = listaDeTrabalhos->operacoes;
             operacoes = InserirInicioListaOperacoes(operacoes, idOperacao, descOperacao, maquinas);
             listaDeTrabalhos->operacoes = operacoes;
@@ -277,13 +588,13 @@ Trabalhos *AdicionarTrabalho(Trabalhos *trabalhos)
     printf("||                    INSERIR TRABALHO                   ||\n");
     printf("||=======================================================||\n");
 
+    fflush(stdin);
     // INSERIR NOME DO TRABALHO
-    printf("Digite o nome do Trabalho: ");
+    printf("|| DIGITE O NOME DO TRABALHO: ");
     scanf("%s", descTrabalho);
+    fflush(stdin);
 
-    // INSERIR ID DA OPERAÇÃO
-    printf("Insira o ID do Trabalho: ");
-    scanf("%d", &idTrabalho);
+    idTrabalho = proximoIdTrabalho();
 
     system("cls");
     trabalhos = InserirInicioListaTrabalhos(trabalhos, idTrabalho, descTrabalho, operacoes);
@@ -308,7 +619,7 @@ void percorrerTrabalhos(Trabalhos *trabalhos)
     {
         printf("\tID Trabalho: %d\n", listaDeTrabalhos->idTrabalho);
         printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
-        /*         
+        /*
             printf("\tOperações do Trabalho: \n");
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
             while (listaDeOperacoes != NULL)
@@ -338,38 +649,43 @@ void percorrerTrabalhos(Trabalhos *trabalhos)
     }
     printf("||========================================================||\n");
 }
-Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho){
+Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
+{
     Trabalhos *listaDeTrabalhos = trabalhos;
     while (listaDeTrabalhos != NULL)
     {
-        Operacoes *nodoAtual = listaDeTrabalhos->operacoes;
-        Operacoes *nodoAnterior;
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
+            Operacoes *nodoAtual = listaDeTrabalhos->operacoes;
+            Operacoes *nodoAnterior;
 
-        if (nodoAtual->idOperacao == idOperacao)
-        {
-            listaDeTrabalhos->operacoes = nodoAtual->seguinte;
-            free(nodoAtual);
-        }
-        else
-        {
-            nodoAnterior = listaDeTrabalhos->operacoes;// Armazena a informação da operação
-            nodoAtual = nodoAnterior->seguinte; // Segue para a proxima operação
-            while ((nodoAtual != NULL) && (nodoAtual->idOperacao != idOperacao))
+            if (nodoAtual->idOperacao == idOperacao)
             {
-                nodoAnterior = nodoAtual;
-                nodoAtual = nodoAtual->seguinte;
-            }
-            if (nodoAtual != NULL)
-            {
-                nodoAnterior->seguinte = nodoAtual->seguinte;
+                listaDeTrabalhos->operacoes = nodoAtual->seguinte;
                 free(nodoAtual);
+            }
+            else
+            {
+                nodoAnterior = listaDeTrabalhos->operacoes; // Armazena a informação da operação
+                nodoAtual = nodoAnterior->seguinte;         // Segue para a proxima operação
+                while ((nodoAtual != NULL) && (nodoAtual->idOperacao != idOperacao))
+                {
+                    nodoAnterior = nodoAtual;
+                    nodoAtual = nodoAtual->seguinte;
+                }
+                if (nodoAtual != NULL)
+                {
+                    nodoAnterior->seguinte = nodoAtual->seguinte;
+                    free(nodoAtual);
+                }
             }
         }
         listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     return trabalhos;
 }
-void listarTrabalho(Trabalhos *trabalhos, int idTrabalho){
+void listarTrabalho(Trabalhos *trabalhos, int idTrabalho)
+{
     system("cls");
     int found = 0;
     int opcao;
@@ -377,22 +693,23 @@ void listarTrabalho(Trabalhos *trabalhos, int idTrabalho){
     Trabalhos *listaDeTrabalhos = trabalhos;
     while (listaDeTrabalhos != NULL)
     {
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             printf("||========================================================||\n");
             printf("||                       TRABALHO                         ||\n");
             printf("||========================================================||\n");
             found = 1;
             printf("\tID Trabalho: %d\n", listaDeTrabalhos->idTrabalho);
             printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
-                    
+
             printf("\tOperações do Trabalho: \n");
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
             while (listaDeOperacoes != NULL)
             {
                 printf("\t\tID Operação: %d\n", listaDeOperacoes->idOperacao);
                 printf("\t\tNome da Operação: %s\n", listaDeOperacoes->descOperacao);
+                /*
                 printf("\t\tMáquinas Operação: \n");
-                /* 
                 Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
                 while (listaDeMaquinas != NULL)
                 {
@@ -401,7 +718,7 @@ void listarTrabalho(Trabalhos *trabalhos, int idTrabalho){
                     printf("\t\t\tTempo de duração da Operação: %.2f\n", listaDeMaquinas->tempo);
                     printf("\t\t\t------------------------\n");
                     listaDeMaquinas = listaDeMaquinas->seguinte;
-                } 
+                }
                 */
                 printf("\t\t------------------------\n");
                 listaDeOperacoes = listaDeOperacoes->seguinte;
@@ -410,7 +727,8 @@ void listarTrabalho(Trabalhos *trabalhos, int idTrabalho){
         listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     printf("||========================================================||\n");
-    if(found == 0){
+    if (found == 0)
+    {
         printf("||              ID DE TRABALHO NÃO ENCONTRADO             ||\n");
         printf("||========================================================||\n");
         system("pause");
@@ -419,56 +737,382 @@ void listarTrabalho(Trabalhos *trabalhos, int idTrabalho){
     printf("||                                                        ||\n");
     printf("|| 1 - VER OPERAÇÃO                                       ||\n");
     printf("|| 2 - ADICIONAR OPERAÇÃO                                 ||\n");
-    printf("|| 3 - EDITAR OPERAÇÃO                                    ||\n");
+    printf("|| 3 - EDITAR NOME OPERAÇÃO                               ||\n");
     printf("|| 4 - REMOVER OPERAÇÃO                                   ||\n");
     printf("|| 9 - VOLTAR                                             ||\n");
     printf("|| 0 - SAIR                                               ||\n");
     printf("||                                                        ||\n");
     printf("||========================================================||\n");
-    printf("||========================================================||\n");
     printf("|| OPÇÃO: ");
     scanf("%d", &opcao);
-    switch(opcao){
-        case 1:
-            //VER OPERAÇÃO
-            printf("||========================================================||\n");
-            printf("|| ID DA OPERAÇÃO QUE PRETENDE VER: ");
-            scanf("%d", &idOperacao);
-            listarOperacao(trabalhos, idOperacao, idTrabalho);
-            system("pause");        
-            break;
-        case 2:
-            //ADICIONAR OPERAÇÃO
-            trabalhos = AdicionarOperacao(trabalhos, idTrabalho);
-            listarTrabalho(trabalhos, idTrabalho);
-            break;
-        case 3:
-            //editarOperacao(trabalhos, IDTrabalho);
-            break;
-        case 4:
-            //removerOperacao(trabalhos, IDTrabalho);
-            break;
-        case 9:
-            menuTrabalhos(trabalhos);
-            break;
-        case 0:
-            exit(0);
-            break;
-        default:
-            printf("||========================================================||\n");
-            printf("||                 OPÇÃO INVÁLIDA                         ||\n");
-            printf("||========================================================||\n");
-            system("pause");
-            listarTrabalho(trabalhos, idTrabalho);
-            break;
+    switch (opcao)
+    {
+    case 1:
+        // VER OPERAÇÃO
+        printf("||========================================================||\n");
+        printf("|| ID DA OPERAÇÃO QUE PRETENDE VER: ");
+        scanf("%d", &idOperacao);
+        listarOperacao(trabalhos, idOperacao, idTrabalho);
+        system("pause");
+        break;
+    case 2:
+        // ADICIONAR OPERAÇÃO
+        trabalhos = AdicionarOperacao(trabalhos, idTrabalho);
+        salvarFicheiro(trabalhos);
+        listarTrabalho(trabalhos, idTrabalho);
+        break;
+    case 3:
+        printf("||========================================================||\n");
+        printf("|| ID DA OPERAÇÃO QUE PRETENDE EDITAR: ");
+        scanf("%d", &idOperacao);
+        trabalhos = EditarOperacao(trabalhos, idTrabalho, idOperacao);
+        salvarFicheiro(trabalhos);
+        listarTrabalho(trabalhos, idTrabalho);
+        break;
+    case 4:
+        printf("||========================================================||\n");
+        printf("|| ID DA OPERAÇÃO QUE PRETENDE REMOVER: ");
+        scanf("%d", &idOperacao);
+        DeleteOperacao(trabalhos, idOperacao, idTrabalho);
+        salvarFicheiro(trabalhos);
+        listarTrabalho(trabalhos, idTrabalho);
+        break;
+    case 9:
+        menuTrabalhos(trabalhos);
+        break;
+    case 0:
+        exit(0);
+        break;
+    default:
+        printf("||========================================================||\n");
+        printf("||                 OPÇÃO INVÁLIDA                         ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+        listarTrabalho(trabalhos, idTrabalho);
+        break;
     }
 }
-/* FIM TRABALHOS */
+Trabalhos *EditarTrabalho(Trabalhos *trabalhos, int idTrabalho)
+{
+    int found = 0;
+    system("cls");
+    Trabalhos *listaDeTrabalhos = trabalhos;
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
+            found = 1;
+            printf("||========================================================||\n");
+            printf("||                     EDITAR TRABALHO                    ||\n");
+            printf("||========================================================||\n");
+            printf("\tID Trabalho: %d\n", listaDeTrabalhos->idTrabalho);
+            printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
+            printf("||========================================================||\n");
+            printf("|| NOVO NOME DO TRABALHO:");
+            scanf("%s", listaDeTrabalhos->descTrabalho);
+        }
 
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
+    }
+    printf("||========================================================||\n");
+    if (found == 0)
+    {
+        printf("||              ID DE TRABALHO NÃO ENCONTRADO             ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    return trabalhos;
+}
+Trabalhos *DeleteTrabalho(Trabalhos *trabalhos, int idTrabalho)
+{
+    system("cls");
+    Trabalhos *nodoAtual = trabalhos;
+    Trabalhos *nodoAnterior;
+    int found = 0;
+    if (nodoAtual->idTrabalho == idTrabalho)
+    {
+        found = 1;
+        trabalhos = nodoAtual->seguinte;
+        free(nodoAtual);
+    }
+    else
+    {
+        nodoAnterior = trabalhos;
+        nodoAtual = nodoAnterior->seguinte;
+        while ((nodoAtual != NULL) && (nodoAtual->idTrabalho != idTrabalho))
+        {
+            nodoAnterior = nodoAtual;
+            nodoAtual = nodoAtual->seguinte;
+        }
+        if (nodoAtual != NULL)
+        {
+            nodoAnterior->seguinte = nodoAtual->seguinte;
+            free(nodoAtual);
+            found = 1;
+        }
+    }
+
+    if (found == 0)
+    {
+        printf("||========================================================||\n");
+        printf("||              ID DE TRABALHO NÃO ENCONTRADO             ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    else
+    {
+        printf("||========================================================||\n");
+        printf("||                 TRABALHO REMOVIDO                      ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+
+    return trabalhos;
+}
+Trabalhos *EditarOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao)
+{
+    int found = 0;
+    system("cls");
+    Trabalhos *listaDeTrabalhos = trabalhos;
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
+            Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
+            while (listaDeOperacoes != NULL)
+            {
+                if (listaDeOperacoes->idOperacao == idOperacao)
+                {
+                    found = 1;
+                    printf("||========================================================||\n");
+                    printf("||                     EDITAR OPERAÇÃO                    ||\n");
+                    printf("||========================================================||\n");
+                    printf("\tID Operação: %d\n", listaDeOperacoes->idOperacao);
+                    printf("\tNome da Operação: %s\n", listaDeOperacoes->descOperacao);
+                    printf("||========================================================||\n");
+                    printf("|| NOVO NOME DA OPERAÇÃO:");
+                    scanf("%s", listaDeOperacoes->descOperacao);
+                }
+
+                listaDeOperacoes = listaDeOperacoes->seguinte;
+            }
+        }
+
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
+    }
+    printf("||========================================================||\n");
+    if (found == 0)
+    {
+        printf("||              ID DE OPERAÇÃO NÃO ENCONTRADO             ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    return trabalhos;
+}
+Trabalhos *EditarMaquinaOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao, int idMaquina)
+{
+    int found = 0;
+    system("cls");
+    Trabalhos *listaDeTrabalhos = trabalhos;
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
+            Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
+            while (listaDeOperacoes != NULL)
+            {
+                if (listaDeOperacoes->idOperacao == idOperacao)
+                {
+                    Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
+                    while (listaDeMaquinas != NULL)
+                    {
+                        if (listaDeMaquinas->idMaquina == idMaquina)
+                        {
+                            found = 1;
+                            printf("||========================================================||\n");
+                            printf("||                     EDITAR MAQUINA                     ||\n");
+                            printf("||========================================================||\n");
+                            printf("\tID Máquina: %d\n", listaDeMaquinas->idMaquina);
+                            printf("\tNome da Máquina: %s\n", listaDeMaquinas->descMaquina);
+                            printf("\tTempo de duração da Operação: %f\n", listaDeMaquinas->tempo);
+                            printf("||========================================================||\n");
+                            printf("|| NOVO TEMPO DE DURAÇÃO DA OPERAÇÃO: ");
+                            scanf("%f", &listaDeMaquinas->tempo);
+                        }
+                        listaDeMaquinas = listaDeMaquinas->seguinte;
+                    }
+                }
+                listaDeOperacoes = listaDeOperacoes->seguinte;
+            }
+        }
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
+    }
+    if (found == 0)
+    {
+        printf("||========================================================||\n");
+        printf("||               ID DA MAQUINA NÃO ENCONTRADO             ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    else if (found == 1)
+    {
+        printf("||========================================================||\n");
+        printf("||                      TEMPO EDITADO                     ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+    }
+    return trabalhos;
+}
+Trabalhos *DeleteMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho, int idMaquina)
+{
+    Trabalhos *listaDeTrabalhos = trabalhos;
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
+            Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
+            while (listaDeOperacoes != NULL)
+            {
+
+                if (listaDeOperacoes->idOperacao == idOperacao)
+                {
+                    Maquinas *nodoAtual = listaDeOperacoes->maquinas;
+                    Maquinas *nodoAnterior;
+                    if (nodoAtual->idMaquina == idMaquina)
+                    {
+                        listaDeOperacoes->maquinas = nodoAtual->seguinte;
+                        free(nodoAtual);
+                    }
+                    else
+                    {
+                        nodoAnterior = listaDeOperacoes->maquinas; 
+                        nodoAtual = nodoAnterior->seguinte;    
+                        while ((nodoAtual != NULL) && (nodoAtual->idMaquina != idMaquina))
+                        {
+                            nodoAnterior = nodoAtual;
+                            nodoAtual = nodoAtual->seguinte;
+                        }
+                        if (nodoAtual != NULL)
+                        {
+                            nodoAnterior->seguinte = nodoAtual->seguinte;
+                            free(nodoAtual);
+                        }
+                    }
+                }
+                listaDeOperacoes = listaDeOperacoes->seguinte;
+            }
+        }
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
+    }
+    return trabalhos;
+}
+/* FIM TRABALHOS */
+/* INICIO LER FICHEIRO MAQUINAS */
+Maquinas *lerFicheiroMaquinas(Maquinas *maquinas)
+{
+    FILE *file = fopen("complemetFiles/maquinas.txt", "r");
+    char c = 1;
+    char keywords[][20] = {"", "NomeMaquina", "IDMaquina"};
+    char descMaquina[100];
+    int idMaquina;
+    if (file == NULL)
+    {
+        printf("Error: ERRO AO ABRIR FICHEIRO!\n");
+        return NULL;
+    }
+    else
+    {
+        while ((c = fgetc(file)) != EOF)
+        {
+            if (c == ' ')
+            {
+                continue;
+            }
+            else
+            {
+                if (c == '[')
+                {
+                    continue;
+                }
+                if (c == '{')
+                {
+
+                    while ((c = fgetc(file)) != '}')
+                    {
+                        // printf("%c", c);
+                        if (c == ' ' || c == '\n')
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            char key[100], value[100];
+                            fscanf(file, "%[^\":,}]*c", key);
+                            // printf("%d\n", sizeof(key));
+                            if (!(strcmp(key, keywords[1])))
+                            {
+                                // NOME DO TRABALHO
+                                fgets(key, sizeof(key), file);
+                                sscanf(key, "%*[:\" ]%[a-zA-Z0-9]s", descMaquina);
+                                // printf("\n\n%s -> %s\n", keywords[1], descMaquina);
+                            }
+                            else if (!(strcmp(key, keywords[2])))
+                            {
+                                // ID DO TRABALHO
+                                fgets(key, sizeof(key), file);
+                                sscanf(key, "%*[:\" ]%[0-9]s", &idMaquina);
+                                // printf("%s -> %s\n", keywords[2], &idMaquina);
+                                maquinas = InserirInicioListaMaquinas(maquinas, idMaquina - '0', descMaquina, 0);
+                            }
+
+                            // printf("Guardar Maquina\n");
+                        }
+                    }
+                }
+            }
+        }
+        fclose(file);
+        return maquinas;
+    }
+}
+/* FIM LER FICHEIRO MAQUINAS*/
+/* INICIO ESCREVER FICHEIRO MAQUINAS */
+void salvarFicheiroMaquinas(Maquinas *maquinas)
+{
+    FILE *file = fopen("complemetFiles/maquinas.txt", "w");
+    if (file == NULL)
+    {
+        printf("Erro ao abrir o ficheiro\n");
+    }
+    else
+    {
+        fprintf(file, "[\n");
+        Maquinas *listaDeMaquinas = maquinas;
+        while (listaDeMaquinas != NULL)
+        {
+            fprintf(file, "\t{\n");
+
+            fprintf(file, "\t\t\"NomeMaquina\": \"%s\"\n", listaDeMaquinas->descMaquina);
+            fprintf(file, "\t\t\"IDMaquina\": %d\n", listaDeMaquinas->idMaquina);
+            listaDeMaquinas = listaDeMaquinas->seguinte;
+            if (listaDeMaquinas != NULL)
+            {
+                fprintf(file, "\t},\n");
+            }
+            else
+            {
+                fprintf(file, "\t}\n");
+            }
+        }
+        fprintf(file, "]\n");
+        fclose(file);
+    }
+}
+/* FIM ESCREVER FICHEIRO MAQUINAS */
 /* INICIO LER FICHEIRO */
 Trabalhos *lerFicheiro(Trabalhos *trabalhos)
 {
-    FILE *file = fopen("complemetFiles/jobs_formated_print.txt", "r");
+    FILE *file = fopen("complemetFiles/jobs_formated.txt", "r");
     char c = 1;
     char keywords[][20] = {"Trabalhos", "NomeTrabalho", "IDTrabalho", "Operações", "NomeOperação", "IDOperação", "Maquinas", "NomeMaquina", "IDMaquina", "TempoMaquina"};
     char descTrabalho[100];
@@ -667,11 +1311,10 @@ Trabalhos *lerFicheiro(Trabalhos *trabalhos)
     }
 }
 /* FIM LER FICHEIRO */
-
 /* INICIO ESCREVER FICHEIRO */
 void salvarFicheiro(Trabalhos *trabalhos)
 {
-    FILE *file = fopen("complemetFiles/jobs_formated_print.txt", "w");
+    FILE *file = fopen("complemetFiles/jobs_formated.txt", "w");
     if (file == NULL)
     {
         printf("Erro ao abrir o ficheiro\n");
@@ -741,8 +1384,8 @@ void salvarFicheiro(Trabalhos *trabalhos)
     }
 }
 /* FIM ESCREVER FICHEIRO */
-
-void menuTrabalhos(Trabalhos *trabalhos){
+void menuTrabalhos(Trabalhos *trabalhos)
+{
     system("cls");
     int opcao;
     int idTrabalho;
@@ -750,12 +1393,11 @@ void menuTrabalhos(Trabalhos *trabalhos){
     printf("||                                                        ||\n");
     printf("|| 1 - VER JOB                                            ||\n");
     printf("|| 2 - ADICIONAR JOB                                      ||\n");
-    printf("|| 3 - EDITAR JOB                                         ||\n");
+    printf("|| 3 - EDITAR NOME JOB                                    ||\n");
     printf("|| 4 - REMOVER JOB                                        ||\n");
     printf("|| 9 - VOLTAR                                             ||\n");
     printf("|| 0 - SAIR                                               ||\n");
     printf("||                                                        ||\n");
-    printf("||========================================================||\n");
     printf("||========================================================||\n");
     printf("|| OPÇÃO: ");
     scanf("%d", &opcao);
@@ -770,16 +1412,29 @@ void menuTrabalhos(Trabalhos *trabalhos){
         break;
     case 2:
         trabalhos = AdicionarTrabalho(trabalhos);
+        salvarFicheiro(trabalhos);
         menuTrabalhos(trabalhos);
         break;
     case 3:
+        printf("||========================================================||\n");
+        printf("|| ID DO JOB QUE PRETENDE EDITAR: ");
+        scanf("%d", &idTrabalho);
+        trabalhos = EditarTrabalho(trabalhos, idTrabalho);
+        salvarFicheiro(trabalhos);
+        menuTrabalhos(trabalhos);
         break;
     case 4:
+        printf("||========================================================||\n");
+        printf("|| ID DO JOB QUE PRETENDE ELIMINAR: ");
+        scanf("%d", &idTrabalho);
+        DeleteTrabalho(trabalhos, idTrabalho);
+        salvarFicheiro(trabalhos);
+        menuTrabalhos(trabalhos);
         break;
     case 9:
         menuPrincipal(trabalhos);
         break;
-    case 0: 
+    case 0:
         exit(0);
         break;
     default:
@@ -791,65 +1446,79 @@ void menuTrabalhos(Trabalhos *trabalhos){
         break;
     }
 }
-
-void menuPrincipal(Trabalhos *trabalhos){
+void menuPrincipal(Trabalhos *trabalhos)
+{
     system("cls");
     int opcao;
+    Maquinas *maquinas = NULL;
     printf("||========================================================||\n");
     printf("||                      MENU PRINCIPAL                    ||\n");
     printf("||========================================================||\n");
     printf("||                                                        ||\n");
     printf("|| 1 - VER JOBS                                           ||\n");
-    printf("|| 2 - VER ESTATISTICAS DO TRABALHO 1                     ||\n");
+    printf("|| 2 - VER MAQUINAS                                       ||\n");
+    printf("|| 3 - VER ESTATISTICAS DO TRABALHO 1                     ||\n");
     printf("|| 0 - SAIR                                               ||\n");
     printf("||                                                        ||\n");
     printf("||========================================================||\n");
     printf("|| OPÇÃO: ");
     scanf("%d", &opcao);
-    switch(opcao){
-        case 1:
-            menuTrabalhos(trabalhos);
-            break;
-        case 2:
-            EstatisticasJob1(trabalhos);
-            break;
-        case 0:
-            exit(0);
-            break;
-        default:
-            printf("||========================================================||\n");
-            printf("||                 OPÇÃO INVÁLIDA                         ||\n");
-            printf("||========================================================||\n");
-            system("pause");
-            menuPrincipal(trabalhos);
-            break;
+    switch (opcao)
+    {
+    case 1:
+        menuTrabalhos(trabalhos);
+        break;
+    case 2:
+        maquinas = lerFicheiroMaquinas(maquinas);
+        listarMaquinas(maquinas, trabalhos);
+        break;
+    case 3:
+        EstatisticasJob1(trabalhos);
+        break;
+    case 0:
+        exit(0);
+        break;
+    default:
+        printf("||========================================================||\n");
+        printf("||                 OPÇÃO INVÁLIDA                         ||\n");
+        printf("||========================================================||\n");
+        system("pause");
+        menuPrincipal(trabalhos);
+        break;
     }
-}   
-
-void EstatisticasJob1(Trabalhos *trabalhos){
+}
+void EstatisticasJob1(Trabalhos *trabalhos)
+{
     system("cls");
     printf("||========================================================||\n");
-    printf("||                 MELHOR TEMPO DE EXECUÇÃO               ||\n");//SEM FONES
+    printf("||                 MELHOR TEMPO DE EXECUÇÃO               ||\n"); // SEM FONES
     printf("||========================================================||\n");
     int idTrabalho = 1;
     float MelhorTempoTotalJob = 0;
     Trabalhos *listaDeTrabalhos = trabalhos;
     Maquinas *MaquinaAux = (Maquinas *)malloc(sizeof(Maquinas));
-    while(listaDeTrabalhos != NULL){
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
-            while(listaDeOperacoes != NULL){
+            while (listaDeOperacoes != NULL)
+            {
                 MaquinaAux = NULL;
                 Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
                 printf("\t\tOperacao: %s\n", listaDeOperacoes->descOperacao);
-                while(listaDeMaquinas != NULL){
-                    if(MaquinaAux != NULL && MaquinaAux->tempo > listaDeMaquinas->tempo){
-                        MaquinaAux = listaDeMaquinas;
-                    }else if(MaquinaAux == NULL){
+                while (listaDeMaquinas != NULL)
+                {
+                    if (MaquinaAux != NULL && MaquinaAux->tempo > listaDeMaquinas->tempo)
+                    {
                         MaquinaAux = listaDeMaquinas;
                     }
-                    //printf("Nome Maquina %s\n", listaDeMaquinas->descMaquina);
+                    else if (MaquinaAux == NULL)
+                    {
+                        MaquinaAux = listaDeMaquinas;
+                    }
+                    // printf("Nome Maquina %s\n", listaDeMaquinas->descMaquina);
                     listaDeMaquinas = listaDeMaquinas->seguinte;
                 }
                 MelhorTempoTotalJob += MaquinaAux->tempo;
@@ -862,7 +1531,7 @@ void EstatisticasJob1(Trabalhos *trabalhos){
             printf("||O MELHOR TEMPO DE EXECUÇÃO DO TRABALHO É: %.2f\n", MelhorTempoTotalJob);
             printf("||========================================================||\n");
         }
-        listaDeTrabalhos = listaDeTrabalhos->seguinte;        
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     printf("\n\n");
     printf("||========================================================||\n");
@@ -871,21 +1540,28 @@ void EstatisticasJob1(Trabalhos *trabalhos){
     float PiorTempoTotalJob = 0;
     listaDeTrabalhos = trabalhos;
     MaquinaAux = NULL;
-    while(listaDeTrabalhos != NULL){
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
-            while(listaDeOperacoes != NULL){
+            while (listaDeOperacoes != NULL)
+            {
                 MaquinaAux = NULL;
                 Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
                 printf("\t\tOperacao: %s\n", listaDeOperacoes->descOperacao);
-                while(listaDeMaquinas != NULL){
-                    if(MaquinaAux != NULL && MaquinaAux->tempo < listaDeMaquinas->tempo){
-                        MaquinaAux = listaDeMaquinas;
-                    }else if(MaquinaAux == NULL){
+                while (listaDeMaquinas != NULL)
+                {
+                    if (MaquinaAux != NULL && MaquinaAux->tempo < listaDeMaquinas->tempo)
+                    {
                         MaquinaAux = listaDeMaquinas;
                     }
-                    //printf("Nome Maquina %s\n", listaDeMaquinas->descMaquina);
+                    else if (MaquinaAux == NULL)
+                    {
+                        MaquinaAux = listaDeMaquinas;
+                    }
+                    // printf("Nome Maquina %s\n", listaDeMaquinas->descMaquina);
                     listaDeMaquinas = listaDeMaquinas->seguinte;
                 }
                 PiorTempoTotalJob += MaquinaAux->tempo;
@@ -898,7 +1574,7 @@ void EstatisticasJob1(Trabalhos *trabalhos){
             printf("||O PIOR TEMPO DE EXECUÇÃO DO TRABALHO É: %.2f\n", PiorTempoTotalJob);
             printf("||========================================================||\n");
         }
-        listaDeTrabalhos = listaDeTrabalhos->seguinte;        
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     printf("\n\n");
     printf("||========================================================||\n");
@@ -908,32 +1584,35 @@ void EstatisticasJob1(Trabalhos *trabalhos){
     int countMaquinas = 0;
     listaDeTrabalhos = trabalhos;
     MaquinaAux = NULL;
-    while(listaDeTrabalhos != NULL){
-        if(listaDeTrabalhos->idTrabalho == idTrabalho){
+    while (listaDeTrabalhos != NULL)
+    {
+        if (listaDeTrabalhos->idTrabalho == idTrabalho)
+        {
             printf("\tNome do Trabalho: %s\n", listaDeTrabalhos->descTrabalho);
             Operacoes *listaDeOperacoes = listaDeTrabalhos->operacoes;
-            while(listaDeOperacoes != NULL){
+            while (listaDeOperacoes != NULL)
+            {
                 MaquinaAux = NULL;
                 countMaquinas = 0;
                 MediaTempoOperacao = 0;
                 Maquinas *listaDeMaquinas = listaDeOperacoes->maquinas;
                 printf("\t\tOperacao: %s\n", listaDeOperacoes->descOperacao);
-                while(listaDeMaquinas != NULL){
+                while (listaDeMaquinas != NULL)
+                {
                     MediaTempoOperacao = MediaTempoOperacao + listaDeMaquinas->tempo;
                     countMaquinas++;
                     listaDeMaquinas = listaDeMaquinas->seguinte;
                 }
-                MediaTempoOperacao = MediaTempoOperacao/countMaquinas;
+                MediaTempoOperacao = MediaTempoOperacao / countMaquinas;
                 printf("\t\tTEMPO MÉDIO DE EXECUÇÃO DA OPERAÇÃO: %.2f\n", MediaTempoOperacao);
                 printf("\t\t------------------------\n");
                 listaDeOperacoes = listaDeOperacoes->seguinte;
             }
         }
-        listaDeTrabalhos = listaDeTrabalhos->seguinte;        
+        listaDeTrabalhos = listaDeTrabalhos->seguinte;
     }
     system("pause");
 }
-
 int main()
 {
     // Define o valor das páginas de código UTF8 e default do Windows
@@ -942,32 +1621,6 @@ int main()
     // Define codificação como sendo UTF-8
     SetConsoleOutputCP(CPAGE_UTF8);
 
-    /*
-        Maquinas *maquinas = NULL;
-        maquinas = AdicionarMaquina(maquinas);
-        percorrerMaquinas(maquinas);
-    */
-
-    /*
-        Operacoes *operacoes = NULL;
-        operacoes = AdicionarOperacao(operacoes);
-        percorrerOperacoes(operacoes);
-    */
-
-    /*
-        Trabalhos *trabalhos = NULL;
-        trabalhos = AdicionarTrabalho(trabalhos);
-        percorrerTrabalhos(trabalhos);
-    */
-
-
-    /*     
-        Trabalhos *trabalhos = NULL;
-        trabalhos = lerFicheiro(trabalhos);
-        trabalhos = DeleteOperacao(trabalhos, 5);
-        percorrerTrabalhos(trabalhos);
-        salvarFicheiro(trabalhos); 
-    */
     Trabalhos *trabalhos = NULL;
     trabalhos = lerFicheiro(trabalhos);
     menuPrincipal(trabalhos);
