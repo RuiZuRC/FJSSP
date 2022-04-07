@@ -1,0 +1,34 @@
+[
+	{
+		"NomeMaquina": "Maquina1"
+		"IDMaquina": 1
+	},
+	{
+		"NomeMaquina": "Maquina2"
+		"IDMaquina": 2
+	},
+	{
+		"NomeMaquina": "Maquina3"
+		"IDMaquina": 3
+	},
+	{
+		"NomeMaquina": "Maquina4"
+		"IDMaquina": 4
+	},
+	{
+		"NomeMaquina": "Maquina5"
+		"IDMaquina": 5
+	},
+	{
+		"NomeMaquina": "Maquina6"
+		"IDMaquina": 6
+	},
+	{
+		"NomeMaquina": "Maquina7"
+		"IDMaquina": 7
+	},
+	{
+		"NomeMaquina": "Maquina8"
+		"IDMaquina": 8
+	}
+]
