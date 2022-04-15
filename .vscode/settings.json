@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "windows.h": "c",
+        "estruturas.h": "c",
+        "funcoes_maquinas.h": "c",
+        "funcoes_operacoes.h": "c",
+        "funcoes_trabalhos.h": "c"
     }
 }

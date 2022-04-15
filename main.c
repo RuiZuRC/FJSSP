@@ -32,37 +32,11 @@ typedef struct Trabalho
     struct Trabalho *seguinte;
 } Trabalhos;
 
-void menuPrincipal(Trabalhos *trabalhos);//MENU PRINCIPAL
-void menuTrabalhos(Trabalhos *trabalhos);//MENU DE TRABALHOS
-void EstatisticasJob1(Trabalhos *trabalhos);//ESTATISTICAS DOS JOBS
+#include "maquinas.h"
+#include "operacoes.h"
+#include "trabalhos.h"
 
-Trabalhos *lerFicheiro(Trabalhos *trabalhos);//LER TRABALHOS DO FICHEIRO TXT
-void salvarFicheiro(Trabalhos *trabalhos);//GUARDAR TRABALHOS NO FICHEIRO TXT
-int proximoIdMaquina();//RETORNA O PROXIMO ID DA MAQUINA
-Maquinas *AdicionarMaquina(Maquinas *maquinas, int tipo);//ADICIONAR NOVO BLOCO DE MEMORIA PARA MAQUINA
-Maquinas *InserirInicioListaMaquinas(Maquinas *maquinas, int idMaquina, char descMaquina[100], float tempo);//INSERIR MAQUINA NO INICIO DA LISTA
-void percorrerMaquinas(Maquinas *maquinas);//PERCORRE A LISTA DE MAQUINAS
-void listarMaquinas(Maquinas *maquinas, Trabalhos *trabalhos);//MENU DE MAQUINAS
-Maquinas *EditarMaquina(Maquinas *maquinas, int idMaquina);//EDITAR MAQUINA
-Maquinas *DeleteMaquina(Maquinas *maquinas, int idMaquina);//REMOVER MAQUINA
-Maquinas *lerFicheiroMaquinas(Maquinas *maquinas);//LER MAQUINAS DO FICHEIRO TXT
-void salvarFicheiroMaquinas(Maquinas *maquinas);//GUARDAR MAQUINAS NO FICHEIRO TXT
-int proximoIdOperacao();//RETORNA O PROXIMO ID DA OPERACAO
-Operacoes *InserirInicioListaOperacoes(Operacoes *operacoes, int idOperacao, char descOperacao[100], Maquinas *maquinas);//INSERIR OPERACAO NO INICIO DA LISTA
-void percorrerOperacoes(Operacoes *operacoes);//PERCORRE A LISTA DE OPERACOES
-void listarOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho);//MENU DE OPERACOES
-int proximoIdTrabalho();//RETORNA O PROXIMO ID DO TRABALHO
-Trabalhos *AdicionarOperacao(Trabalhos *trabalhos, int idTrabalho);//ADICIONAR NOVO BLOCO DE MEMORIA PARA OPERACAO
-Trabalhos *AdicionarTrabalho(Trabalhos *trabalhos);//ADICIONAR NOVO BLOCO DE MEMORIA PARA TRABALHO
-Trabalhos *InserirInicioListaTrabalhos(Trabalhos *trabalhos, int idTrabalho, char descTrabalho[100], Operacoes *operacoes);//INSERIR TRABALHO NO INICIO DA LISTA
-void percorrerTrabalhos(Trabalhos *trabalhos);//PERCORRE A LISTA DE TRABALHOS
-Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho);//REMOVER OPERACAO
-void listarTrabalho(Trabalhos *trabalhos, int idTrabalho);//MENU DE TRABALHOS
-Trabalhos *EditarTrabalho(Trabalhos *trabalhos, int idTrabalho);//EDITAR TRABALHO
-Trabalhos *DeleteTrabalho(Trabalhos *trabalhos, int idTrabalho);//REMOVER TRABALHO
-Trabalhos *EditarOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao);//EDITAR OPERACAO
-Trabalhos *EditarMaquinaOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao, int idMaquina);//EDITAR MAQUINA DA OPERACAO
-Trabalhos *DeleteMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho, int idMaquina);//REMOVER MAQUINA DA OPERACAO
+void menuPrincipal(Trabalhos *trabalhos);//MENU PRINCIPAL
 
 /*============= INICIO - MAQUINAS =============*/
 int proximoIdMaquina()
