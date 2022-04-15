@@ -9,6 +9,7 @@ Maquinas *DeleteMaquina(Maquinas *maquinas, int idMaquina);//REMOVER MAQUINA
 Trabalhos *AdicionarMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho);//ADICIONAR MAQUINA NA OPERACAO
 Trabalhos *EditarMaquinaOperacao(Trabalhos *trabalhos, int idTrabalho, int idOperacao, int idMaquina);//EDITAR MAQUINA DA OPERACAO
 Trabalhos *DeleteMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho, int idMaquina);//REMOVER MAQUINA DA OPERACAO
+void removerMaquinasTodas(Maquinas *maquinas);//REMOVER TODAS AS MAQUINAS
 
 Maquinas *lerFicheiroMaquinas(Maquinas *maquinas);//LER MAQUINAS DO FICHEIRO TXT
 void salvarFicheiroMaquinas(Maquinas *maquinas);//GUARDAR MAQUINAS NO FICHEIRO TXT

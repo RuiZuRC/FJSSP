@@ -100,7 +100,7 @@ void percorrerMaquinas(Maquinas *maquinas)
 {
     Maquinas *listaDeMaquinas = maquinas;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS AUXILIAR
     printf("||========================================================||\n");
-    printf("||                  Listagem de Máquinas                  ||\n");
+    printf("||                  LISTAGEM DE MAQUINAS                  ||\n");
     printf("||========================================================||\n");
     while (listaDeMaquinas != NULL)
     {
@@ -274,7 +274,6 @@ Maquinas *DeleteMaquina(Maquinas *maquinas, int idMaquina)
     }
     return maquinas;//RETORNA A LISTA DE MAQUINAS ATUALIZADA
 }
-
 Trabalhos *AdicionarMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
 {
     system("cls");//LIMPA A TELA
@@ -496,6 +495,18 @@ Trabalhos *DeleteMaquinaOperacao(Trabalhos *trabalhos, int idOperacao, int idTra
         system("pause");
     }
     return trabalhos;//RETORNA A LISTA DE TRABALHOS ATUALIZADA
+}
+void removerMaquinasTodas(Maquinas *maquinas)
+{
+    Maquinas *listaMaquinas = maquinas;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS
+    Maquinas *listaMaquinasAux;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS AUXILIAR
+    while (listaMaquinas != NULL)
+    {
+        Maquinas *listaMaquinasAux = listaMaquinas;//ATUALIZA A LISTA DE MAQUINAS AUXILIAR
+        listaMaquinas = listaMaquinas->seguinte;//PROXIMA MAQUINA
+        //printf("%d\n", listaMaquinasAux->idMaquina);
+        free(listaMaquinasAux);//LIBERTA A MEMORIA DA MAQUINA
+    }
 }
 /*============= FIM - MAQUINAS =============*/
 
@@ -753,6 +764,8 @@ Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
                 {
                     // SE A OPERAÇÃO ENCONTRADA NA PRIMEIRO POSIÇÃO
                     listaDeTrabalhos->operacoes = nodoAtual->seguinte;//ATUALIZA A LISTA DE OPERAÇÕES 
+                    Maquinas *listaDeMaquinas = nodoAtual->maquinas;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS
+                    removerMaquinasTodas(listaDeMaquinas);//CHAMA A FUNÇÃO PARA REMOVER TODAS AS MAQUINAS DA OPERAÇÃO
                     free(nodoAtual);//LIBERTA A MEMORIA
                     found = 1;//OPERAÇÃO ENCONTRADA
                 }
@@ -770,6 +783,8 @@ Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
                     {
                         // SE A OPERAÇÃO ENCONTRADA
                         nodoAnterior->seguinte = nodoAtual->seguinte;//LISTA DE OPERAÇÕES ANTERIOR APONTA PARA A PROXIMA OPERAÇÃO DA LISTA ATUAL
+                        Maquinas *listaDeMaquinas = nodoAtual->maquinas;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS
+                        removerMaquinasTodas(listaDeMaquinas);//CHAMA A FUNÇÃO PARA REMOVER TODAS AS MAQUINAS DA OPERAÇÃO
                         free(nodoAtual);//LIBERTA A MEMORIA
                         found = 1;//OPERAÇÃO ENCONTRADA
                     }
@@ -797,6 +812,19 @@ Trabalhos *DeleteOperacao(Trabalhos *trabalhos, int idOperacao, int idTrabalho)
     }
 
     return trabalhos;//RETORNA A LISTA DE TRABALHOS ATUALIZADA
+}
+void removerOperacoesTodas(Operacoes *operacoes)
+{
+    Operacoes *listaOperacoes = operacoes;//VARIAVEL PARA ARMAZENAR A LISTA DE OPERAÇÕES
+    Operacoes *listaOperacoesAux;//VARIAVEL PARA ARMAZENAR A LISTA DE OPERAÇÕES AUXILIAR
+    while (listaOperacoes != NULL)
+    {
+        Operacoes *listaOperacoesAux = listaOperacoes;//ATUALIZA A LISTA DE OPERAÇÕES AUXILIAR
+        Maquinas *listaMaquinas = listaOperacoesAux->maquinas;//VARIAVEL PARA ARMAZENAR A LISTA DE MAQUINAS
+        listaOperacoes = listaOperacoes->seguinte;//PROXIMA OPERAÇÃO
+        removerMaquinasTodas(listaMaquinas);//CHAMA A FUNÇÃO PARA REMOVER TODAS AS MAQUINAS DA OPERAÇÃO
+        free(listaOperacoesAux);//LIBERTA A MEMORIA DA AUXILIAR
+    }
 }
 /*============= FIM - OPERAÇÕES =============*/
 
@@ -1044,6 +1072,8 @@ Trabalhos *DeleteTrabalho(Trabalhos *trabalhos, int idTrabalho)
         //SE ENCONTROU O TRABALHO NA PRIMEIRA POSIÇÃO DA LISTA
         found = 1;//TRABALHO ENCONTRADO
         trabalhos = nodoAtual->seguinte;//ATUALIZA A LISTA
+        Operacoes *operacoes = nodoAtual->operacoes;//VARIAVEL PARA ARMAZENAR AS OPERAÇÕES DO TRABALHO
+        removerOperacoesTodas(operacoes);//REMOVE TODAS AS OPERAÇÕES DO TRABALHO
         free(nodoAtual);//LIBERTA A MEMORIA
     }
     else
@@ -1061,6 +1091,8 @@ Trabalhos *DeleteTrabalho(Trabalhos *trabalhos, int idTrabalho)
         {
             //SE ENCONTROU O NODO A SER REMOVIDO
             nodoAnterior->seguinte = nodoAtual->seguinte;//ATUALIZA A PROXIMA POSIÇÂO DO NODO ANTERIOR PARA A PROXIMA POSIÇÂO DO NODO ATUAL
+            Operacoes *operacoes = nodoAtual->operacoes;//VARIAVEL PARA ARMAZENAR AS OPERAÇÕES DO TRABALHO
+            removerOperacoesTodas(operacoes);//REMOVE TODAS AS OPERAÇÕES DO TRABALHO
             free(nodoAtual);//LIBERA A MEMORIA
             found = 1;//TRABALHO ENCONTRADO
         }
