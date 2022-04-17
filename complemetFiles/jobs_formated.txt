@@ -1,16 +1,47 @@
 [
 	{
-		"NomeTrabalho": "Process2"
-		"IDTrabalho": 2
+		"NomeTrabalho": "Process1"
+		"IDTrabalho": 1
 		"Operações": [
 			{
-				"NomeOperação": "Operacao1"
-				"IDOperação": 1
+				"NomeOperação": "Operacao4"
+				"IDOperação": 4
 				"Maquinas": [
 					{
-						"NomeMaquina": "Maquina1"
-						"IDMaquina": 1
+						"NomeMaquina": "Maquina8"
+						"IDMaquina": 8
+						"TempoMaquina": 9.00
+					},
+					{
+						"NomeMaquina": "Maquina7"
+						"IDMaquina": 7
+						"TempoMaquina": 5.00
+					},
+					{
+						"NomeMaquina": "Maquina6"
+						"IDMaquina": 6
 						"TempoMaquina": 4.00
+					},
+					{
+						"NomeMaquina": "Maquina5"
+						"IDMaquina": 5
+						"TempoMaquina": 5.00
+					},
+					{
+						"NomeMaquina": "Maquina4"
+						"IDMaquina": 4
+						"TempoMaquina": 5.00
+					}
+				]
+			},
+			{
+				"NomeOperação": "Operacao3"
+				"IDOperação": 3
+				"Maquinas": [
+					{
+						"NomeMaquina": "Maquina5"
+						"IDMaquina": 5
+						"TempoMaquina": 6.00
 					},
 					{
 						"NomeMaquina": "Maquina3"
@@ -24,20 +55,20 @@
 				"IDOperação": 2
 				"Maquinas": [
 					{
+						"NomeMaquina": "Maquina4"
+						"IDMaquina": 4
+						"TempoMaquina": 5.00
+					},
+					{
 						"NomeMaquina": "Maquina2"
 						"IDMaquina": 2
 						"TempoMaquina": 4.00
-					},
-					{
-						"NomeMaquina": "Maquina4"
-						"IDMaquina": 4
-						"TempoMaquina": 5.00
 					}
 				]
 			},
 			{
-				"NomeOperação": "Operacao3"
-				"IDOperação": 3
+				"NomeOperação": "Operacao1"
+				"IDOperação": 1
 				"Maquinas": [
 					{
 						"NomeMaquina": "Maquina3"
@@ -45,93 +76,9 @@
 						"TempoMaquina": 5.00
 					},
 					{
-						"NomeMaquina": "Maquina5"
-						"IDMaquina": 5
-						"TempoMaquina": 6.00
-					}
-				]
-			},
-			{
-				"NomeOperação": "Operacao4"
-				"IDOperação": 4
-				"Maquinas": [
-					{
-						"NomeMaquina": "Maquina4"
-						"IDMaquina": 4
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina5"
-						"IDMaquina": 5
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina6"
-						"IDMaquina": 6
+						"NomeMaquina": "Maquina1"
+						"IDMaquina": 1
 						"TempoMaquina": 4.00
-					},
-					{
-						"NomeMaquina": "Maquina7"
-						"IDMaquina": 7
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina8"
-						"IDMaquina": 8
-						"TempoMaquina": 9.00
-					}
-				]
-			}
-		]
-	},
-	{
-		"NomeTrabalho": "Process1"
-		"IDTrabalho": 1
-		"Operações": [
-			{
-				"NomeOperação": "Operacao3"
-				"IDOperação": 3
-				"Maquinas": [
-					{
-						"NomeMaquina": "Maquina3"
-						"IDMaquina": 3
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina5"
-						"IDMaquina": 5
-						"TempoMaquina": 6.00
-					}
-				]
-			},
-			{
-				"NomeOperação": "Operacao4"
-				"IDOperação": 4
-				"Maquinas": [
-					{
-						"NomeMaquina": "Maquina4"
-						"IDMaquina": 4
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina5"
-						"IDMaquina": 5
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina6"
-						"IDMaquina": 6
-						"TempoMaquina": 4.00
-					},
-					{
-						"NomeMaquina": "Maquina7"
-						"IDMaquina": 7
-						"TempoMaquina": 5.00
-					},
-					{
-						"NomeMaquina": "Maquina8"
-						"IDMaquina": 8
-						"TempoMaquina": 9.00
 					}
 				]
 			}
